@@ -11,24 +11,44 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
-      <Link to="/" className="text-xl font-bold tracking-tight">VeriVotes</Link>
-      <div className="flex items-center gap-6">
-        {isAuthenticated ? (
-          <>
-            <Link to="/dashboard" className="text-sm text-gray-300 hover:text-white">Dashboard</Link>
-            {(user?.role === 'SUPER_ADMIN' || user?.role === 'ELECTION_ADMIN') && (
-              <Link to="/admin" className="text-sm text-gray-300 hover:text-white">Admin</Link>
-            )}
-            <span className="text-sm text-gray-400">{user?.fullName}</span>
-            <button onClick={handleLogout} className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="text-sm text-gray-300 hover:text-white">Login</Link>
-            <Link to="/register" className="text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Register</Link>
-          </>
-        )}
+    <nav className="bg-white border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center">
+              <span className="text-white text-xs font-bold">V</span>
+            </div>
+            <span className="text-sm font-semibold text-black tracking-tight">VeriVotes</span>
+          </Link>
+          {isAuthenticated && (
+            <div className="hidden md:flex items-center gap-6">
+              <Link to="/dashboard" className="text-sm text-gray-500 hover:text-black transition-colors">Elections</Link>
+              {(user?.role === 'SUPER_ADMIN' || user?.role === 'ELECTION_ADMIN') && (
+                <Link to="/admin" className="text-sm text-gray-500 hover:text-black transition-colors">Admin</Link>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-white text-xs font-medium">
+                  {user?.fullName[0]}
+                </div>
+                <span className="text-sm text-gray-700 hidden md:block">{user?.fullName}</span>
+              </div>
+              <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-black transition-colors border border-gray-200 px-3 py-1.5 rounded-md hover:border-gray-400">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm text-gray-500 hover:text-black transition-colors">Sign in</Link>
+              <Link to="/register" className="text-sm bg-black text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition-colors">Register</Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   )

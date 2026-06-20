@@ -29,7 +29,7 @@ export default function BallotPage() {
     const positionIds = election.positions.map((p: any) => p.id)
     const unvoted = positionIds.filter((pid: string) => !selections[pid])
     if (unvoted.length > 0) {
-      setError('Please select a candidate for every position')
+      setError('Please select a candidate for every position before submitting')
       return
     }
     setSubmitting(true)
@@ -46,34 +46,76 @@ export default function BallotPage() {
     }
   }
 
-  if (loading) return <div className="min-h-screen bg-gray-950 text-gray-400 flex items-center justify-center">Loading ballot...</div>
+  const totalPositions = election?.positions?.length || 0
+  const selectedCount = Object.keys(selections).length
+
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="w-5 h-5 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold mb-2">Ballot</h1>
-        <p className="text-gray-400 text-sm mb-8">{election?.title} — Select one candidate per position</p>
-        {error && <div className="bg-red-900/40 text-red-300 text-sm px-4 py-3 rounded-lg mb-6">{error}</div>}
-        <div className="space-y-6">
-          {election?.positions?.map((pos: any) => (
-            <div key={pos.id} className="bg-gray-900 rounded-xl p-6">
-              <h2 className="font-semibold mb-4">{pos.title}</h2>
-              <div className="space-y-3">
+
+        <div className="mb-8">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1">Official Ballot</p>
+          <h1 className="text-2xl font-semibold text-black tracking-tight">{election?.title}</h1>
+          <p className="text-sm text-gray-500 mt-1">Select one candidate for each position</p>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-8 flex items-start gap-3">
+          <span className="text-amber-500 text-sm mt-0.5">⚠</span>
+          <div>
+            <p className="text-amber-800 text-sm font-medium">Read before voting</p>
+            <p className="text-amber-700 text-xs mt-0.5">Your vote is anonymous, encrypted, and cannot be changed after submission. Review your selections carefully.</p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-6 mb-8">
+          {election?.positions?.map((pos: any, index: number) => (
+            <div key={pos.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-400 font-medium">Position {index + 1}</p>
+                  <h2 className="font-semibold text-black text-sm mt-0.5">{pos.title}</h2>
+                </div>
+                {selections[pos.id] && (
+                  <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full font-medium">Selected</span>
+                )}
+              </div>
+              <div className="divide-y divide-gray-100">
                 {pos.candidates?.map((c: any) => (
                   <button key={c.id} onClick={() => handleSelect(pos.id, c.id)}
-                    className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl border transition text-left ${
-                      selections[pos.id] === c.id
-                        ? 'border-blue-500 bg-blue-900/30'
-                        : 'border-gray-700 bg-gray-800 hover:border-gray-500'
+                    className={`w-full flex items-center gap-4 px-6 py-4 text-left transition-colors ${
+                      selections[pos.id] === c.id ? 'bg-black' : 'hover:bg-gray-50'
                     }`}>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      selections[pos.id] === c.id ? 'border-blue-500' : 'border-gray-500'
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      selections[pos.id] === c.id ? 'border-white' : 'border-gray-300'
                     }`}>
-                      {selections[pos.id] === c.id && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                      {selections[pos.id] === c.id && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
+                      selections[pos.id] === c.id ? 'bg-white text-black' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {c.user.fullName[0]}
                     </div>
                     <div>
-                      <p className="font-medium text-sm">{c.user.fullName}</p>
-                      {c.manifesto && <p className="text-xs text-gray-400 mt-0.5">{c.manifesto}</p>}
+                      <p className={`font-medium text-sm ${selections[pos.id] === c.id ? 'text-white' : 'text-black'}`}>
+                        {c.user.fullName}
+                      </p>
+                      {c.manifesto && (
+                        <p className={`text-xs mt-0.5 ${selections[pos.id] === c.id ? 'text-gray-300' : 'text-gray-400'}`}>
+                          {c.manifesto}
+                        </p>
+                      )}
                     </div>
                   </button>
                 ))}
@@ -81,11 +123,20 @@ export default function BallotPage() {
             </div>
           ))}
         </div>
-        <button onClick={handleSubmit} disabled={submitting}
-          className="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-medium transition disabled:opacity-50">
-          {submitting ? 'Submitting ballot...' : 'Submit Ballot'}
-        </button>
-        <p className="text-center text-xs text-gray-600 mt-4">Your vote is anonymous and cannot be changed after submission</p>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-black">{selectedCount} of {totalPositions} positions selected</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {selectedCount === totalPositions ? 'Ready to submit' : `${totalPositions - selectedCount} remaining`}
+            </p>
+          </div>
+          <button onClick={handleSubmit} disabled={submitting || selectedCount !== totalPositions}
+            className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            {submitting ? 'Submitting...' : 'Submit Ballot'}
+          </button>
+        </div>
+
       </div>
     </div>
   )

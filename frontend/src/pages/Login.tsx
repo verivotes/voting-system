@@ -27,32 +27,50 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-        <p className="text-gray-400 text-sm mb-8">Sign in to your VeriVotes account</p>
-        {error && <div className="bg-red-900/40 text-red-300 text-sm px-4 py-3 rounded-lg mb-6">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="you@example.com" required />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center mb-6">
+              <span className="text-white text-sm font-bold">V</span>
+            </div>
+            <h1 className="text-2xl font-semibold text-black tracking-tight">Sign in</h1>
+            <p className="text-sm text-gray-500 mt-1">Access your VeriVotes account</p>
           </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••" required />
-          </div>
-          <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-sm font-medium transition disabled:opacity-50">
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don't have an account? <Link to="/register" className="text-blue-400 hover:underline">Register</Link>
-        </p>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">Email address</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="you@institution.edu" required />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">Password</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="••••••••" required />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 mt-2">
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            No account? <Link to="/register" className="text-black font-medium hover:underline">Create one</Link>
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 py-4 px-6">
+        <p className="text-center text-xs text-gray-400">VeriVotes · Transparent Electoral Management System</p>
       </div>
     </div>
   )
