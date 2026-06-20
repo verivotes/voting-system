@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getElections, createElection, updateElectionStatus } from '../api/elections'
 import { verifyAuditChain } from '../api/votes'
 
@@ -66,8 +67,9 @@ export default function AdminPanel() {
         </div>
 
         {message && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg mb-6">
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
             {message}
+            <button onClick={() => setMessage('')} className="text-blue-400 hover:text-blue-700">✕</button>
           </div>
         )}
 
@@ -97,12 +99,18 @@ export default function AdminPanel() {
                   </div>
                   <p className="text-xs text-gray-400">{el.positions?.length || 0} positions · Created {new Date(el.createdAt).toLocaleDateString()}</p>
                 </div>
-                {nextStatus[el.status] && (
-                  <button onClick={() => handleStatusChange(el.id, nextStatus[el.status])}
+                <div className="flex items-center gap-2">
+                  <Link to={`/admin/elections/${el.id}`}
                     className="text-sm border border-gray-200 hover:border-black text-gray-600 hover:text-black px-4 py-2 rounded-lg transition-colors">
-                    {nextLabel[el.status]}
-                  </button>
-                )}
+                    Manage
+                  </Link>
+                  {nextStatus[el.status] && (
+                    <button onClick={() => handleStatusChange(el.id, nextStatus[el.status])}
+                      className="text-sm border border-gray-200 hover:border-black text-gray-600 hover:text-black px-4 py-2 rounded-lg transition-colors">
+                      {nextLabel[el.status]}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

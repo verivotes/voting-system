@@ -9,6 +9,7 @@ import ElectionDetail from './pages/ElectionDetail'
 import BallotPage from './pages/BallotPage'
 import Results from './pages/Results'
 import AdminPanel from './pages/AdminPanel'
+import ManageElection from './pages/ManageElection'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/elections/:id/ballot" element={<ProtectedRoute><BallotPage /></ProtectedRoute>} />
           <Route path="/elections/:id/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+          <Route path="/admin/elections/:id" element={<ProtectedRoute><ManageElection /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
