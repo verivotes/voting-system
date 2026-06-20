@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ELECTION_ADMIN
+  VOTER
+}
+
+enum ElectionStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  RESULTS_PUBLISHED
+}
+
+enum CandidateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  fullName      String
+  role          Role     @default(VOTER)
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  elections     Election[]
+  candidates    Candidate[]
+  voterReceipts VoterReceipt[]
+  auditLogs     AuditLog[]
+  otpTokens     OtpToken[]
+}
+
+model Election {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  status      ElectionStatus  @default(DRAFT)
+  startTime   DateTime
+  endTime     DateTime
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+
+  positions     Position[]
+  voterReceipts VoterReceipt[]
+}
+
+model Position {
+  id         String   @id @default(uuid())
+  title      String
+  maxVotes   Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  election   Election    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  electionId String
+
+  candidates Candidate[]
+}
+
+model Candidate {
+  id         String          @id @default(uuid())
+  manifesto  String?
+  photoUrl   String?
+  status     CandidateStatus @default(PENDING)
+  createdAt  DateTime        @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  positionId String
+
+  votes      Vote[]
+}
+
+model Vote {
+  id          String   @id @default(uuid())
+  voteHash    String
+  castAt      DateTime @default(now())
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+}
+
+model VoterReceipt {
+  id         String   @id @default(uuid())
+  hasVoted   Boolean  @default(false)
+  votedAt    DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+
+  election   Election @relation(fields: [electionId], references: [id])
+  electionId String
+
+  @@unique([userId, electionId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  prevHash   String?
+  entryHash  String
+  timestamp  DateTime @default(now())
+
+  actor      User?   @relation(fields: [actorId], references: [id])
+  actorId    String?
+}
+
+model OtpToken {
+  id        String     @id @default(uuid())
+  token     String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  used      Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+}
