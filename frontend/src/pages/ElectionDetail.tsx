@@ -20,58 +20,108 @@ export default function ElectionDetail() {
       }).catch(() => setLoading(false))
   }, [id])
 
-  if (loading) return <div className="min-h-screen bg-gray-950 text-gray-400 flex items-center justify-center">Loading...</div>
-  if (!election) return <div className="min-h-screen bg-gray-950 text-gray-400 flex items-center justify-center">Election not found</div>
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="w-5 h-5 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+    </div>
+  )
+
+  if (!election) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center text-sm text-gray-400">Election not found</div>
+  )
+
+  const statusConfig: Record<string, string> = {
+    DRAFT: 'bg-gray-100 text-gray-600',
+    OPEN: 'bg-green-50 text-green-700 border border-green-200',
+    CLOSED: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+    RESULTS_PUBLISHED: 'bg-blue-50 text-blue-700 border border-blue-200'
+  }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-3xl mx-auto px-6 py-10">
-        <button onClick={() => navigate('/dashboard')} className="text-gray-400 text-sm mb-6 hover:text-white">← Back</button>
-        <div className="bg-gray-900 rounded-2xl p-8 mb-6">
-          <h1 className="text-2xl font-bold mb-2">{election.title}</h1>
-          <p className="text-gray-400 text-sm mb-4">{election.description}</p>
-          <div className="flex gap-4 text-xs text-gray-500">
-            <span>Start: {new Date(election.startTime).toLocaleString()}</span>
-            <span>End: {new Date(election.endTime).toLocaleString()}</span>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-6 py-10">
+
+        <button onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-black mb-8 transition-colors">
+          ← Back to elections
+        </button>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-8 mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-2">Election</p>
+              <h1 className="text-2xl font-semibold text-black tracking-tight">{election.title}</h1>
+              <p className="text-sm text-gray-500 mt-1">{election.description}</p>
+            </div>
+            <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${statusConfig[election.status]}`}>
+              {election.status.replace('_', ' ')}
+            </span>
+          </div>
+          <div className="flex gap-6 text-xs text-gray-400 pt-4 border-t border-gray-100">
+            <span>Opens: {new Date(election.startTime).toLocaleString('en-GB')}</span>
+            <span>Closes: {new Date(election.endTime).toLocaleString('en-GB')}</span>
           </div>
         </div>
+
         {election.status === 'OPEN' && !hasVoted && (
-          <button onClick={() => navigate(`/elections/${id}/ballot`)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium mb-6 transition">
-            Cast Your Vote
-          </button>
-        )}
-        {hasVoted && (
-          <div className="bg-green-900/30 border border-green-800 text-green-400 text-sm px-4 py-3 rounded-xl mb-6">
-            ✓ You have already voted in this election
+          <div className="bg-black rounded-xl p-6 mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-white font-medium text-sm">This election is open for voting</p>
+              <p className="text-gray-400 text-xs mt-0.5">Your vote is anonymous and cannot be changed</p>
+            </div>
+            <button onClick={() => navigate(`/elections/${id}/ballot`)}
+              className="bg-white text-black px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap">
+              Cast Vote →
+            </button>
           </div>
         )}
+
+        {hasVoted && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            <div>
+              <p className="text-green-800 text-sm font-medium">Vote recorded</p>
+              <p className="text-green-600 text-xs">You have participated in this election</p>
+            </div>
+          </div>
+        )}
+
         {election.status === 'RESULTS_PUBLISHED' && (
           <button onClick={() => navigate(`/elections/${id}/results`)}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-medium mb-6 transition">
-            View Results
+            className="w-full bg-black text-white py-3 rounded-xl text-sm font-medium mb-6 hover:bg-gray-800 transition-colors">
+            View Official Results →
           </button>
         )}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Positions</h2>
-          {election.positions?.map((pos: any) => (
-            <div key={pos.id} className="bg-gray-900 rounded-xl p-5">
-              <h3 className="font-medium mb-3">{pos.title}</h3>
-              <div className="space-y-2">
-                {pos.candidates?.map((c: any) => (
-                  <div key={c.id} className="flex items-center gap-3 bg-gray-800 rounded-lg px-4 py-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">
-                      {c.user.fullName[0]}
+
+        <div>
+          <h2 className="text-xs font-semibold text-black mb-4 uppercase tracking-widest">Positions & Candidates</h2>
+          <div className="space-y-4">
+            {election.positions?.map((pos: any) => (
+              <div key={pos.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                  <h3 className="font-medium text-sm text-black">{pos.title}</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">{pos.candidates?.length || 0} candidate{pos.candidates?.length !== 1 ? 's' : ''}</p>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {pos.candidates?.length === 0 ? (
+                    <p className="px-6 py-4 text-sm text-gray-400">No approved candidates yet</p>
+                  ) : pos.candidates?.map((c: any) => (
+                    <div key={c.id} className="px-6 py-4 flex items-center gap-4">
+                      <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                        {c.user.fullName[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-black">{c.user.fullName}</p>
+                        {c.manifesto && <p className="text-xs text-gray-400 mt-0.5">{c.manifesto}</p>}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{c.user.fullName}</p>
-                      {c.manifesto && <p className="text-xs text-gray-400">{c.manifesto}</p>}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
