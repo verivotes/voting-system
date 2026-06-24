@@ -1,6 +1,7 @@
 import prisma from '../utils/prisma'
 import { hashPassword, comparePassword, generateOtp } from '../utils/hash'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt'
+const { sendOtpEmail } = require('./emailService')
 import { OtpPurpose } from '@prisma/client'
 
 export async function registerUser(email: string, password: string, fullName: string) {
@@ -23,6 +24,16 @@ export async function registerUser(email: string, password: string, fullName: st
       expiresAt
     }
   })
+
+  try {
+    await sendOtpEmail(email, otp, fullName)
+    console.log(`OTP email sent to ${email}`)
+  } catch (err: any) {
+    console.error('Failed to send OTP email — full error:', err.message)
+    console.error('Error code:', err.code)
+    console.error('Error response:', err.response)
+    console.log(`Fallback OTP for ${email}: ${otp}`)
+  }
 
   return { user, otp }
 }
@@ -60,5 +71,11 @@ export async function loginUser(email: string, password: string) {
   const accessToken = generateAccessToken(user.id, user.role)
   const refreshToken = generateRefreshToken(user.id)
 
-  return { accessToken, refreshToken, user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role } }
+  return {
+    accessToken,
+    refreshToken,
+    user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+  }
 }
+
+module.exports = { registerUser, verifyOtp, loginUser }
