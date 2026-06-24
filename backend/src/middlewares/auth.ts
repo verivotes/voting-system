@@ -10,7 +10,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   const token = authHeader.split(' ')[1]
   try {
     const decoded = verifyAccessToken(token)
-    req.user = decoded
+    req.user = { userId: decoded.userId, role: decoded.role as any }
     next()
   } catch {
     return res.status(401).json({ message: 'Invalid or expired token' })
@@ -25,4 +25,5 @@ export const authorize = (...roles: string[]) => {
     next()
   }
 }
+
 module.exports = { authenticate, authorize }

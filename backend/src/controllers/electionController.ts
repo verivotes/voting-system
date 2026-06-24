@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
-import {
+
+const {
   createElection,
   getAllElections,
   getElectionById,
@@ -7,8 +8,7 @@ import {
   registerCandidate,
   updateElectionStatus,
   approveCandidate
-} from '../services/electionService'
-import { ElectionStatus } from '@prisma/client'
+} = require('../services/electionService')
 
 export async function httpCreateElection(req: Request, res: Response): Promise<void> {
   try {
@@ -32,8 +32,8 @@ export async function httpCreateElection(req: Request, res: Response): Promise<v
 
 export async function httpGetAllElections(req: Request, res: Response): Promise<void> {
   try {
-    const { status } = req.query
-    const elections = await getAllElections(status as ElectionStatus)
+    const status = req.query.status as string | undefined
+    const elections = await getAllElections(status)
     res.status(200).json(elections)
   } catch (error: any) {
     res.status(400).json({ message: error.message })
@@ -42,7 +42,7 @@ export async function httpGetAllElections(req: Request, res: Response): Promise<
 
 export async function httpGetElectionById(req: Request, res: Response): Promise<void> {
   try {
-    const election = await getElectionById(req.params.id)
+    const election = await getElectionById(req.params.id as string)
     res.status(200).json(election)
   } catch (error: any) {
     res.status(404).json({ message: error.message })
@@ -56,7 +56,7 @@ export async function httpAddPosition(req: Request, res: Response): Promise<void
       res.status(400).json({ message: 'Position title is required' })
       return
     }
-    const position = await addPosition(req.params.id, title, maxVotes)
+    const position = await addPosition(req.params.id as string, title, maxVotes)
     res.status(201).json(position)
   } catch (error: any) {
     res.status(400).json({ message: error.message })
@@ -66,7 +66,7 @@ export async function httpAddPosition(req: Request, res: Response): Promise<void
 export async function httpRegisterCandidate(req: Request, res: Response): Promise<void> {
   try {
     const { manifesto } = req.body
-    const candidate = await registerCandidate(req.params.positionId, req.user!.userId, manifesto)
+    const candidate = await registerCandidate(req.params.positionId as string, req.user!.userId, manifesto)
     res.status(201).json(candidate)
   } catch (error: any) {
     res.status(400).json({ message: error.message })
@@ -80,7 +80,7 @@ export async function httpUpdateStatus(req: Request, res: Response): Promise<voi
       res.status(400).json({ message: 'Status is required' })
       return
     }
-    const election = await updateElectionStatus(req.params.id, status)
+    const election = await updateElectionStatus(req.params.id as string, status)
     res.status(200).json(election)
   } catch (error: any) {
     res.status(400).json({ message: error.message })
@@ -89,12 +89,13 @@ export async function httpUpdateStatus(req: Request, res: Response): Promise<voi
 
 export async function httpApproveCandidate(req: Request, res: Response): Promise<void> {
   try {
-    const candidate = await approveCandidate(req.params.candidateId)
+    const candidate = await approveCandidate(req.params.candidateId as string)
     res.status(200).json(candidate)
   } catch (error: any) {
     res.status(400).json({ message: error.message })
   }
 }
+
 module.exports = {
   httpCreateElection,
   httpGetAllElections,
