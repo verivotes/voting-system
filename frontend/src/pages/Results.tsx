@@ -53,7 +53,6 @@ export default function Results() {
           ← Back to election
         </button>
 
-        {/* Header */}
         <div className="mb-8 pb-8 border-b border-gray-200">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1">Official Results</p>
           <h1 className="text-3xl font-semibold text-black tracking-tight">{results?.election?.title}</h1>
@@ -66,9 +65,8 @@ export default function Results() {
           </div>
         </div>
 
-        {/* Positions */}
         <div className="space-y-8">
-          {results?.positions?.map((pos: any, posIndex: number) => {
+          {results?.positions?.map((pos: any) => {
             const totalVotes = pos.candidates.reduce((sum: number, c: any) => sum + c.votes, 0)
             const winner = pos.candidates[0]
 
@@ -79,7 +77,6 @@ export default function Results() {
                   <span className="text-xs text-gray-400">{totalVotes} vote{totalVotes !== 1 ? 's' : ''}</span>
                 </div>
 
-                {/* Winner card */}
                 {winner && totalVotes > 0 && (
                   <div className="bg-black rounded-xl p-6 mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -100,7 +97,6 @@ export default function Results() {
                   </div>
                 )}
 
-                {/* All candidates */}
                 <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                   <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-12 gap-4">
                     <span className="col-span-1 text-xs font-medium text-gray-400">#</span>
@@ -112,7 +108,6 @@ export default function Results() {
                     {pos.candidates.map((c: any, i: number) => {
                       const pct = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0
                       const isWinner = i === 0 && totalVotes > 0
-
                       return (
                         <div key={c.id} className="px-6 py-4 grid grid-cols-12 gap-4 items-center">
                           <div className="col-span-1">
@@ -121,34 +116,22 @@ export default function Results() {
                             </span>
                           </div>
                           <div className="col-span-5 flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
-                              isWinner ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'
-                            }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${isWinner ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}>
                               {c.name[0]}
                             </div>
                             <div>
-                              <p className={`text-sm font-medium ${isWinner ? 'text-black' : 'text-gray-600'}`}>
-                                {c.name}
-                              </p>
-                              {isWinner && (
-                                <span className="text-xs text-gray-400">Elected</span>
-                              )}
+                              <p className={`text-sm font-medium ${isWinner ? 'text-black' : 'text-gray-600'}`}>{c.name}</p>
+                              {isWinner && <span className="text-xs text-gray-400">Elected</span>}
                             </div>
                           </div>
                           <div className="col-span-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full transition-all duration-500 ${isWinner ? 'bg-black' : 'bg-gray-300'}`}
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
+                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className={`h-full rounded-full transition-all duration-500 ${isWinner ? 'bg-black' : 'bg-gray-300'}`}
+                                style={{ width: `${pct}%` }} />
                             </div>
                           </div>
                           <div className="col-span-2 text-right">
-                            <span className={`text-sm font-semibold ${isWinner ? 'text-black' : 'text-gray-400'}`}>
-                              {pct}%
-                            </span>
+                            <span className={`text-sm font-semibold ${isWinner ? 'text-black' : 'text-gray-400'}`}>{pct}%</span>
                             <p className="text-xs text-gray-400">{c.votes} votes</p>
                           </div>
                         </div>
@@ -161,7 +144,6 @@ export default function Results() {
           })}
         </div>
 
-        {/* Footer */}
         <div className="mt-10 pt-6 border-t border-gray-200 flex items-center justify-between">
           <p className="text-xs text-gray-400">Results verified by SHA-256 audit chain</p>
           <div className="flex items-center gap-1.5 text-xs text-gray-400">
@@ -169,7 +151,6 @@ export default function Results() {
             Audit chain intact
           </div>
         </div>
-
       </div>
     </div>
   )
