@@ -42,7 +42,7 @@ export default function ElectionDetail() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <button onClick={() => navigate('/dashboard')}
-          className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-black text-black text-sm font-medium px-4 py-2 rounded-lg transition-all hover:shadow-sm mb-8">
+          className="inline-flex items-center gap-2 bg-white border border-gray-200 text-black text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 mb-8">
           ← Back to elections
         </button>
 
@@ -70,7 +70,7 @@ export default function ElectionDetail() {
               <p className="text-gray-400 text-xs mt-0.5">Your vote is anonymous and cannot be changed</p>
             </div>
             <button onClick={() => navigate(`/elections/${id}/ballot`)}
-              className="bg-white text-black px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap self-start sm:self-auto">
+              className="bg-white text-black px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap self-start sm:self-auto">
               Cast Vote →
             </button>
           </div>
@@ -90,7 +90,7 @@ export default function ElectionDetail() {
 
         {election.status === 'RESULTS_PUBLISHED' && (
           <button onClick={() => navigate(`/elections/${id}/results`)}
-            className="w-full bg-black text-white py-3 rounded-xl text-sm font-medium mb-6 hover:bg-gray-800 transition-colors">
+            className="w-full bg-black text-white py-3 rounded-xl text-sm font-medium mb-6 transition-all duration-200 hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 ring-2 ring-offset-2 ring-transparent hover:ring-gray-400">
             View Official Results →
           </button>
         )}

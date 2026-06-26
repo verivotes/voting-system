@@ -34,7 +34,7 @@ export default function Results() {
         </div>
         <p className="text-sm font-medium text-black mb-1">Results unavailable</p>
         <p className="text-sm text-gray-400">{error}</p>
-        <button onClick={() => navigate(-1)} className="mt-6 inline-flex items-center gap-2 bg-black text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+        <button onClick={() => navigate(-1)} className="mt-6 inline-flex items-center gap-2 bg-black text-white text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5">
           ← Go back
         </button>
       </div>
@@ -49,7 +49,7 @@ export default function Results() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <button onClick={() => navigate(`/elections/${id}`)}
-          className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-black text-black text-sm font-medium px-4 py-2 rounded-lg transition-all hover:shadow-sm mb-8">
+          className="inline-flex items-center gap-2 bg-white border border-gray-200 text-black text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 mb-8">
           ← Back to election
         </button>
 
