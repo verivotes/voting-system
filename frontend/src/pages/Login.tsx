@@ -31,9 +31,12 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center mb-6">
-              <span className="text-white text-sm font-bold">V</span>
-            </div>
+<svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-6">
+  <rect width="28" height="28" rx="6" fill="black"/>
+  <rect x="7" y="8" width="14" height="13" rx="1.5" stroke="white" strokeWidth="1.5"/>
+  <path d="M7 11h14" stroke="white" strokeWidth="1.5"/>
+  <path d="M11 15.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
             <h1 className="text-2xl font-semibold text-black tracking-tight">Sign in</h1>
             <p className="text-sm text-gray-500 mt-1">Access your VeriVotes account</p>
           </div>

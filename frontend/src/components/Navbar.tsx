@@ -14,12 +14,15 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center">
-              <span className="text-white text-xs font-bold">V</span>
-            </div>
-            <span className="text-sm font-semibold text-black tracking-tight">VeriVotes</span>
-          </Link>
+<Link to="/" className="flex items-center gap-2">
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="28" height="28" rx="6" fill="black"/>
+    <rect x="7" y="8" width="14" height="13" rx="1.5" stroke="white" strokeWidth="1.5"/>
+    <path d="M7 11h14" stroke="white" strokeWidth="1.5"/>
+    <path d="M11 15.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+  <span className="text-sm font-semibold text-black tracking-tight">VeriVotes</span>
+</Link>
           {isAuthenticated && (
             <div className="hidden md:flex items-center gap-6">
               <Link to="/dashboard" className="text-sm text-gray-500 hover:text-black transition-colors">Elections</Link>
