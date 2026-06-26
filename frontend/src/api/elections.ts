@@ -19,3 +19,5 @@ export const approveCandidate = (candidateId: string) =>
   API.put(`/elections/candidates/${candidateId}/approve`, {})
 export const deleteElection = (id: string) =>
   API.delete(`/elections/${id}`)
+export const registerAsCandidate = (positionId: string, data: { manifesto: string }) =>
+  API.post(`/elections/positions/${positionId}/candidates`, data)

@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getElection } from '../api/elections'
+import { getElection, registerAsCandidate } from '../api/elections'
 import { getVotingStatus } from '../api/votes'
+import { useAuth } from '../hooks/useAuth'
 
 export default function ElectionDetail() {
   const { id } = useParams()
   const [election, setElection] = useState<any>(null)
   const [hasVoted, setHasVoted] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [applyingTo, setApplyingTo] = useState<string | null>(null)
+  const [manifesto, setManifesto] = useState('')
+  const [applying, setApplying] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const { user } = useAuth()
   const navigate = useNavigate()
 
-  useEffect(() => {
+  const fetchElection = () => {
     if (!id) return
     Promise.all([getElection(id), getVotingStatus(id)])
       .then(([electionRes, statusRes]) => {
@@ -18,7 +25,25 @@ export default function ElectionDetail() {
         setHasVoted(statusRes.data.hasVoted)
         setLoading(false)
       }).catch(() => setLoading(false))
-  }, [id])
+  }
+
+  useEffect(() => { fetchElection() }, [id])
+
+  const handleApply = async (positionId: string) => {
+    setApplying(true)
+    setError('')
+    try {
+      await registerAsCandidate(positionId, { manifesto })
+      setMessage('Application submitted successfully. Await admin approval.')
+      setApplyingTo(null)
+      setManifesto('')
+      fetchElection()
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to submit application')
+    } finally {
+      setApplying(false)
+    }
+  }
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -37,6 +62,9 @@ export default function ElectionDetail() {
     RESULTS_PUBLISHED: 'bg-blue-50 text-blue-700 border border-blue-200'
   }
 
+  const isAlreadyCandidate = (pos: any) =>
+    pos.candidates?.some((c: any) => c.user?.email === user?.email || c.userId === user?.id)
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -45,6 +73,20 @@ export default function ElectionDetail() {
           className="inline-flex items-center gap-2 bg-white border border-gray-200 text-black text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 mb-8">
           ← Back to elections
         </button>
+
+        {message && (
+          <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
+            {message}
+            <button onClick={() => setMessage('')} className="text-green-400 hover:text-green-700">✕</button>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
+            {error}
+            <button onClick={() => setError('')} className="text-red-400 hover:text-red-700">✕</button>
+          </div>
+        )}
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
@@ -100,14 +142,51 @@ export default function ElectionDetail() {
           <div className="space-y-4">
             {election.positions?.map((pos: any) => (
               <div key={pos.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
-                  <h3 className="font-medium text-sm text-black">{pos.title}</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">{pos.candidates?.length || 0} candidate{pos.candidates?.length !== 1 ? 's' : ''}</p>
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium text-sm text-black">{pos.title}</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">{pos.candidates?.filter((c: any) => c.status === 'APPROVED').length || 0} approved candidate{pos.candidates?.length !== 1 ? 's' : ''}</p>
+                  </div>
+                  {election.status === 'DRAFT' && !isAlreadyCandidate(pos) && (
+                    <button onClick={() => setApplyingTo(applyingTo === pos.id ? null : pos.id)}
+                      className="text-xs bg-black text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                      Apply as Candidate
+                    </button>
+                  )}
+                  {election.status === 'DRAFT' && isAlreadyCandidate(pos) && (
+                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-3 py-1.5 rounded-lg font-medium">
+                      Application Submitted
+                    </span>
+                  )}
                 </div>
+
+                {applyingTo === pos.id && (
+                  <div className="px-4 sm:px-6 py-4 bg-gray-50 border-b border-gray-100">
+                    <p className="text-sm font-medium text-black mb-3">Your manifesto</p>
+                    <textarea
+                      value={manifesto}
+                      onChange={e => setManifesto(e.target.value)}
+                      className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+                      placeholder="Tell voters why you should be elected..."
+                      rows={3}
+                    />
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={() => handleApply(pos.id)} disabled={applying}
+                        className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50">
+                        {applying ? 'Submitting...' : 'Submit Application'}
+                      </button>
+                      <button onClick={() => { setApplyingTo(null); setManifesto('') }}
+                        className="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:border-gray-400 transition-colors">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="divide-y divide-gray-100">
-                  {pos.candidates?.length === 0 ? (
+                  {pos.candidates?.filter((c: any) => c.status === 'APPROVED').length === 0 ? (
                     <p className="px-4 sm:px-6 py-4 text-sm text-gray-400">No approved candidates yet</p>
-                  ) : pos.candidates?.map((c: any) => (
+                  ) : pos.candidates?.filter((c: any) => c.status === 'APPROVED').map((c: any) => (
                     <div key={c.id} className="px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4">
                       <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                         {c.user.fullName[0]}
