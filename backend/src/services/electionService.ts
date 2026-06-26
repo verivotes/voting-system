@@ -29,10 +29,9 @@ export async function getElectionById(id: string) {
       createdBy: { select: { fullName: true, email: true } },
       positions: {
         include: {
-          candidates: {
-            where: { status: 'APPROVED' },
-            include: { user: { select: { fullName: true, email: true } } }
-          }
+candidates: {
+  include: { user: { select: { fullName: true, email: true } } }
+}
         }
       }
     }
