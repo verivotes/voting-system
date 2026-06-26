@@ -62,6 +62,8 @@ export default function ElectionDetail() {
     RESULTS_PUBLISHED: 'bg-blue-50 text-blue-700 border border-blue-200'
   }
 
+  const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ELECTION_ADMIN'
+
   const isAlreadyCandidate = (pos: any) =>
     pos.candidates?.some((c: any) => c.user?.email === user?.email || c.userId === user?.id)
 
@@ -145,22 +147,29 @@ export default function ElectionDetail() {
                 <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                   <div>
                     <h3 className="font-medium text-sm text-black">{pos.title}</h3>
-                    <p className="text-xs text-gray-400 mt-0.5">{pos.candidates?.filter((c: any) => c.status === 'APPROVED').length || 0} approved candidate{pos.candidates?.length !== 1 ? 's' : ''}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {pos.candidates?.filter((c: any) => c.status === 'APPROVED').length || 0} approved candidate{pos.candidates?.filter((c: any) => c.status === 'APPROVED').length !== 1 ? 's' : ''}
+                    </p>
                   </div>
-                  {election.status === 'DRAFT' && !isAlreadyCandidate(pos) && (
+                  {election.status === 'DRAFT' && !isAdmin && !isAlreadyCandidate(pos) && (
                     <button onClick={() => setApplyingTo(applyingTo === pos.id ? null : pos.id)}
                       className="text-xs bg-black text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
                       Apply as Candidate
                     </button>
                   )}
-                  {election.status === 'DRAFT' && isAlreadyCandidate(pos) && (
+                  {election.status === 'DRAFT' && !isAdmin && isAlreadyCandidate(pos) && (
                     <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-3 py-1.5 rounded-lg font-medium">
                       Application Submitted
                     </span>
                   )}
+                  {isAdmin && election.status === 'DRAFT' && (
+                    <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1.5 rounded-lg font-medium">
+                      Admin View
+                    </span>
+                  )}
                 </div>
 
-                {applyingTo === pos.id && (
+                {applyingTo === pos.id && !isAdmin && (
                   <div className="px-4 sm:px-6 py-4 bg-gray-50 border-b border-gray-100">
                     <p className="text-sm font-medium text-black mb-3">Your manifesto</p>
                     <textarea
