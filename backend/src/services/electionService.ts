@@ -95,8 +95,21 @@ module.exports = {
   approveCandidate
 }
 export async function removeElection(id: string) {
-  const election = await prisma.election.findUnique({ where: { id } })
+  const election = await prisma.election.findUnique({
+    where: { id },
+    include: { positions: { include: { candidates: { include: { votes: true } } } } }
+  })
   if (!election) throw new Error('Election not found')
   if (election.status === 'OPEN') throw new Error('Cannot delete an open election')
+
+  // Delete in order: votes → candidates → positions → voter receipts → election
+  for (const position of election.positions) {
+    for (const candidate of position.candidates) {
+      await prisma.vote.deleteMany({ where: { candidateId: candidate.id } })
+    }
+    await prisma.candidate.deleteMany({ where: { positionId: position.id } })
+  }
+  await prisma.position.deleteMany({ where: { electionId: id } })
+  await prisma.voterReceipt.deleteMany({ where: { electionId: id } })
   return prisma.election.delete({ where: { id } })
 }
