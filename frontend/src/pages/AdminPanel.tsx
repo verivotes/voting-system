@@ -25,7 +25,10 @@ export default function AdminPanel() {
       setMessage('Election created successfully')
       const res = await getElections()
       setElections(res.data)
-      setTitle(''); setDescription(''); setStartTime(''); setEndTime('')
+      setTitle('')
+      setDescription('')
+      setStartTime('')
+      setEndTime('')
       setActiveTab('elections')
     } catch (err: any) {
       setMessage(err.response?.data?.message || 'Failed to create election')
@@ -54,8 +57,18 @@ export default function AdminPanel() {
     }
   }
 
-  const nextStatus: Record<string, string> = { DRAFT: 'OPEN', OPEN: 'CLOSED', CLOSED: 'RESULTS_PUBLISHED' }
-  const nextLabel: Record<string, string> = { DRAFT: 'Open Election', OPEN: 'Close Election', CLOSED: 'Publish Results' }
+  const nextStatus: Record<string, string> = {
+    DRAFT: 'OPEN',
+    OPEN: 'CLOSED',
+    CLOSED: 'RESULTS_PUBLISHED'
+  }
+
+  const nextLabel: Record<string, string> = {
+    DRAFT: 'Open Election',
+    OPEN: 'Close Election',
+    CLOSED: 'Publish Results'
+  }
+
   const statusColor: Record<string, string> = {
     DRAFT: 'bg-gray-100 text-gray-600',
     OPEN: 'bg-green-50 text-green-700 border border-green-200',
@@ -122,12 +135,12 @@ export default function AdminPanel() {
                       {nextLabel[el.status]}
                     </button>
                   )}
-{el.status !== 'OPEN' && (
-  <button onClick={() => handleDelete(el.id)}
-    className="text-sm border border-red-200 hover:border-red-500 text-red-500 hover:text-red-700 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-sm">
-    Delete
-  </button>
-)}
+                  {el.status !== 'OPEN' && (
+                    <button onClick={() => handleDelete(el.id)}
+                      className="text-sm border border-red-200 hover:border-red-500 text-red-500 hover:text-red-700 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-sm">
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -137,4 +150,72 @@ export default function AdminPanel() {
         {activeTab === 'create' && (
           <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8">
             <h2 className="font-semibold text-black mb-6">Create New Election</h2>
-            <form onSubmit={handleCreate} className="space-y-5"></form>
+            <form onSubmit={handleCreate} className="space-y-5">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1.5 block">Election title</label>
+                <input value={title} onChange={e => setTitle(e.target.value)}
+                  className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="e.g. Student Union Election 2025" required />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1.5 block">Description</label>
+                <input value={description} onChange={e => setDescription(e.target.value)}
+                  className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Brief description of the election" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1.5 block">Start date & time</label>
+                  <input type="datetime-local" value={startTime} onChange={e => setStartTime(e.target.value)}
+                    className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" required />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1.5 block">End date & time</label>
+                  <input type="datetime-local" value={endTime} onChange={e => setEndTime(e.target.value)}
+                    className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" required />
+                </div>
+              </div>
+              <div className="pt-2">
+                <button type="submit" className="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5">
+                  Create Election
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {activeTab === 'audit' && (
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+              <h2 className="font-semibold text-black text-sm">Audit Chain Status</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Cryptographic verification of all election events</p>
+            </div>
+            <div className="p-6">
+              {auditStatus ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Chain integrity</span>
+                    <span className={`text-sm font-medium ${auditStatus.intact ? 'text-green-600' : 'text-red-600'}`}>
+                      {auditStatus.intact ? '✓ Intact' : '✗ Compromised'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Total log entries</span>
+                    <span className="text-sm font-medium text-black">{auditStatus.totalEntries}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-gray-600">Algorithm</span>
+                    <span className="text-sm font-medium text-black font-mono">SHA-256</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">Loading audit status...</p>
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  )
+}
