@@ -27,14 +27,14 @@ export default function Results() {
   )
 
   if (error) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="text-center">
         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-gray-400 text-xl">!</span>
         </div>
         <p className="text-sm font-medium text-black mb-1">Results unavailable</p>
         <p className="text-sm text-gray-400">{error}</p>
-        <button onClick={() => navigate(-1)} className="mt-4 text-sm text-gray-400 hover:text-black transition-colors">
+        <button onClick={() => navigate(-1)} className="mt-6 inline-flex items-center gap-2 bg-black text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
           ← Go back
         </button>
       </div>
@@ -46,17 +46,17 @@ export default function Results() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <button onClick={() => navigate(`/elections/${id}`)}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-black mb-8 transition-colors">
+          className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-black text-black text-sm font-medium px-4 py-2 rounded-lg transition-all hover:shadow-sm mb-8">
           ← Back to election
         </button>
 
         <div className="mb-8 pb-8 border-b border-gray-200">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1">Official Results</p>
-          <h1 className="text-3xl font-semibold text-black tracking-tight">{results?.election?.title}</h1>
-          <div className="flex items-center gap-3 mt-3">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-2">Official Results</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-black tracking-tight">{results?.election?.title}</h1>
+          <div className="flex flex-wrap items-center gap-3 mt-3">
             <span className="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full font-medium">
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               Results Published
@@ -65,7 +65,7 @@ export default function Results() {
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-10">
           {results?.positions?.map((pos: any) => {
             const totalVotes = pos.candidates.reduce((sum: number, c: any) => sum + c.votes, 0)
             const winner = pos.candidates[0]
@@ -73,12 +73,12 @@ export default function Results() {
             return (
               <div key={pos.id}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-black uppercase tracking-widest">{pos.title}</h2>
+                  <h2 className="text-xs font-semibold text-black uppercase tracking-widest">{pos.title}</h2>
                   <span className="text-xs text-gray-400">{totalVotes} vote{totalVotes !== 1 ? 's' : ''}</span>
                 </div>
 
                 {winner && totalVotes > 0 && (
-                  <div className="bg-black rounded-xl p-6 mb-4 flex items-center justify-between">
+                  <div className="bg-black rounded-xl p-5 sm:p-6 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-black text-lg font-semibold flex-shrink-0">
                         {winner.name[0]}
@@ -88,7 +88,7 @@ export default function Results() {
                         <p className="text-white font-semibold">{winner.name}</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <p className="text-3xl font-bold text-white">
                         {totalVotes > 0 ? Math.round((winner.votes / totalVotes) * 100) : 0}%
                       </p>
@@ -98,7 +98,7 @@ export default function Results() {
                 )}
 
                 <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                  <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 grid grid-cols-12 gap-4">
+                  <div className="hidden sm:grid px-6 py-3 bg-gray-50 border-b border-gray-100 grid-cols-12 gap-4">
                     <span className="col-span-1 text-xs font-medium text-gray-400">#</span>
                     <span className="col-span-5 text-xs font-medium text-gray-400">Candidate</span>
                     <span className="col-span-4 text-xs font-medium text-gray-400">Votes</span>
@@ -109,13 +109,11 @@ export default function Results() {
                       const pct = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0
                       const isWinner = i === 0 && totalVotes > 0
                       return (
-                        <div key={c.id} className="px-6 py-4 grid grid-cols-12 gap-4 items-center">
-                          <div className="col-span-1">
-                            <span className={`text-sm font-semibold ${isWinner ? 'text-black' : 'text-gray-300'}`}>
-                              {i + 1}
-                            </span>
+                        <div key={c.id} className="px-4 sm:px-6 py-4 flex sm:grid sm:grid-cols-12 sm:gap-4 items-center gap-3">
+                          <div className="hidden sm:block sm:col-span-1">
+                            <span className={`text-sm font-semibold ${isWinner ? 'text-black' : 'text-gray-300'}`}>{i + 1}</span>
                           </div>
-                          <div className="col-span-5 flex items-center gap-3">
+                          <div className="flex-1 sm:col-span-5 flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${isWinner ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}>
                               {c.name[0]}
                             </div>
@@ -124,13 +122,13 @@ export default function Results() {
                               {isWinner && <span className="text-xs text-gray-400">Elected</span>}
                             </div>
                           </div>
-                          <div className="col-span-4">
+                          <div className="hidden sm:block sm:col-span-4">
                             <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                               <div className={`h-full rounded-full transition-all duration-500 ${isWinner ? 'bg-black' : 'bg-gray-300'}`}
                                 style={{ width: `${pct}%` }} />
                             </div>
                           </div>
-                          <div className="col-span-2 text-right">
+                          <div className="sm:col-span-2 text-right flex-shrink-0">
                             <span className={`text-sm font-semibold ${isWinner ? 'text-black' : 'text-gray-400'}`}>{pct}%</span>
                             <p className="text-xs text-gray-400">{c.votes} votes</p>
                           </div>
@@ -144,13 +142,14 @@ export default function Results() {
           })}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-200 flex items-center justify-between">
+        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <p className="text-xs text-gray-400">Results verified by SHA-256 audit chain</p>
           <div className="flex items-center gap-1.5 text-xs text-gray-400">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
             Audit chain intact
           </div>
         </div>
+
       </div>
     </div>
   )

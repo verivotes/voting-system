@@ -39,38 +39,38 @@ export default function ElectionDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <button onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-black mb-8 transition-colors">
+          className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-black text-black text-sm font-medium px-4 py-2 rounded-lg transition-all hover:shadow-sm mb-8">
           ← Back to elections
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-8 mb-6">
-          <div className="flex items-start justify-between mb-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div>
               <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-2">Election</p>
-              <h1 className="text-2xl font-semibold text-black tracking-tight">{election.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-semibold text-black tracking-tight">{election.title}</h1>
               <p className="text-sm text-gray-500 mt-1">{election.description}</p>
             </div>
-            <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${statusConfig[election.status]}`}>
+            <span className={`self-start text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap ${statusConfig[election.status]}`}>
               {election.status.replace('_', ' ')}
             </span>
           </div>
-          <div className="flex gap-6 text-xs text-gray-400 pt-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-xs text-gray-400 pt-4 border-t border-gray-100">
             <span>Opens: {new Date(election.startTime).toLocaleString('en-GB')}</span>
             <span>Closes: {new Date(election.endTime).toLocaleString('en-GB')}</span>
           </div>
         </div>
 
         {election.status === 'OPEN' && !hasVoted && (
-          <div className="bg-black rounded-xl p-6 mb-6 flex items-center justify-between">
+          <div className="bg-black rounded-xl p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-white font-medium text-sm">This election is open for voting</p>
               <p className="text-gray-400 text-xs mt-0.5">Your vote is anonymous and cannot be changed</p>
             </div>
             <button onClick={() => navigate(`/elections/${id}/ballot`)}
-              className="bg-white text-black px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap">
+              className="bg-white text-black px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap self-start sm:self-auto">
               Cast Vote →
             </button>
           </div>
@@ -100,15 +100,15 @@ export default function ElectionDetail() {
           <div className="space-y-4">
             {election.positions?.map((pos: any) => (
               <div key={pos.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
                   <h3 className="font-medium text-sm text-black">{pos.title}</h3>
                   <p className="text-xs text-gray-400 mt-0.5">{pos.candidates?.length || 0} candidate{pos.candidates?.length !== 1 ? 's' : ''}</p>
                 </div>
                 <div className="divide-y divide-gray-100">
                   {pos.candidates?.length === 0 ? (
-                    <p className="px-6 py-4 text-sm text-gray-400">No approved candidates yet</p>
+                    <p className="px-4 sm:px-6 py-4 text-sm text-gray-400">No approved candidates yet</p>
                   ) : pos.candidates?.map((c: any) => (
-                    <div key={c.id} className="px-6 py-4 flex items-center gap-4">
+                    <div key={c.id} className="px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4">
                       <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                         {c.user.fullName[0]}
                       </div>
