@@ -9,8 +9,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return
     }
     const { user, otp } = await registerUser(email, password, fullName)
-    console.log(`OTP for ${email}: ${otp}`)
-    res.status(201).json({ message: 'Registration successful. Check your email for OTP.', userId: user.id })
+    res.status(201).json({ 
+      message: 'Registration successful. Check your email for OTP.', 
+      userId: user.id,
+      otp 
+    })
   } catch (error: any) {
     res.status(400).json({ message: error.message })
   }
