@@ -122,12 +122,12 @@ export default function AdminPanel() {
                       {nextLabel[el.status]}
                     </button>
                   )}
-                  {el.status === 'DRAFT' && (
-                    <button onClick={() => handleDelete(el.id)}
-                      className="text-sm border border-red-200 hover:border-red-500 text-red-500 hover:text-red-700 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-sm">
-                      Delete
-                    </button>
-                  )}
+{el.status !== 'OPEN' && (
+  <button onClick={() => handleDelete(el.id)}
+    className="text-sm border border-red-200 hover:border-red-500 text-red-500 hover:text-red-700 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-sm">
+    Delete
+  </button>
+)}
                 </div>
               </div>
             ))}
