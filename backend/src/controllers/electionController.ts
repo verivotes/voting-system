@@ -96,6 +96,15 @@ export async function httpApproveCandidate(req: Request, res: Response): Promise
   }
 }
 
+export async function httpDeleteElection(req: Request, res: Response): Promise<void> {
+  try {
+    await removeElection(req.params.id as string)
+    res.status(200).json({ message: 'Election deleted successfully' })
+  } catch (error: any) {
+    res.status(400).json({ message: error.message })
+  }
+}
+
 module.exports = {
   httpCreateElection,
   httpGetAllElections,
@@ -103,5 +112,6 @@ module.exports = {
   httpAddPosition,
   httpRegisterCandidate,
   httpUpdateStatus,
-  httpApproveCandidate
+  httpApproveCandidate,
+  httpDeleteElection
 }

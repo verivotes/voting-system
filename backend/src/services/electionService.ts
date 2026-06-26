@@ -94,3 +94,9 @@ module.exports = {
   updateElectionStatus,
   approveCandidate
 }
+export async function removeElection(id: string) {
+  const election = await prisma.election.findUnique({ where: { id } })
+  if (!election) throw new Error('Election not found')
+  if (election.status === 'OPEN') throw new Error('Cannot delete an open election')
+  return prisma.election.delete({ where: { id } })
+}

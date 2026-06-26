@@ -17,3 +17,5 @@ export const addPosition = (electionId: string, data: any) =>
 
 export const approveCandidate = (candidateId: string) =>
   API.put(`/elections/candidates/${candidateId}/approve`, {})
+export const deleteElection = (id: string) =>
+  API.delete(`/elections/${id}`)

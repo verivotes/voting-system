@@ -8,7 +8,8 @@ const {
   httpAddPosition,
   httpRegisterCandidate,
   httpUpdateStatus,
-  httpApproveCandidate
+  httpApproveCandidate,
+  httpDeleteElection
 } = require('../controllers/electionController')
 
 console.log('httpGetAllElections:', typeof httpGetAllElections)
@@ -22,5 +23,6 @@ router.put('/:id/status', authenticate, authorize('SUPER_ADMIN', 'ELECTION_ADMIN
 router.post('/:id/positions', authenticate, authorize('SUPER_ADMIN', 'ELECTION_ADMIN'), httpAddPosition)
 router.post('/positions/:positionId/candidates', authenticate, httpRegisterCandidate)
 router.put('/candidates/:candidateId/approve', authenticate, authorize('SUPER_ADMIN', 'ELECTION_ADMIN'), httpApproveCandidate)
+router.delete('/:id', authenticate, authorize('SUPER_ADMIN', 'ELECTION_ADMIN'), httpDeleteElection)
 
 module.exports = router
