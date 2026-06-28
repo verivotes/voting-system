@@ -55,21 +55,15 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1.5 block">Email address</label>
-              <div className="relative">
-                <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-white border border-gray-300 text-black pl-9 pr-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  placeholder="you@institution.edu" required />
-              </div>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                 placeholder="you@institution.edu" required />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1.5 block">Password</label>
-              <div className="relative">
-                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-white border border-gray-300 text-black pl-9 pr-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  placeholder="••••••••" required />
-              </div>
+             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="••••••••" required />
             </div>
             <button type="submit" disabled={loading}
               className="w-full inline-flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 hover:shadow-lg hover:-translate-y-0.5 mt-2">
