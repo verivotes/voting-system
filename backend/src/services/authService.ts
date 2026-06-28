@@ -9,10 +9,13 @@ export async function registerUser(email: string, password: string, fullName: st
   if (existing) throw new Error('Email already registered')
 
   const passwordHash = await hashPassword(password)
+
+  // Auto-verify on creation — no OTP required to login
   const user = await prisma.user.create({
-    data: { email, passwordHash, fullName }
+    data: { email, passwordHash, fullName, isVerified: true }
   })
 
+  // Generate OTP and send welcome/confirmation email (non-blocking)
   const otp = generateOtp()
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
@@ -25,15 +28,10 @@ export async function registerUser(email: string, password: string, fullName: st
     }
   })
 
-  try {
-    await sendOtpEmail(email, otp, fullName)
-    console.log(`OTP email sent to ${email}`)
-  } catch (err: any) {
-    console.error('Failed to send OTP email — full error:', err.message)
-    console.error('Error code:', err.code)
-    console.error('Error response:', err.response)
-    console.log(`Fallback OTP for ${email}: ${otp}`)
-  }
+  // Send email in background — don't block registration
+  sendOtpEmail(email, otp, fullName).catch((err: any) => {
+    console.error('Email send failed (non-blocking):', err.message)
+  })
 
   return { user, otp }
 }
@@ -63,7 +61,7 @@ export async function verifyOtp(email: string, token: string) {
 export async function loginUser(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) throw new Error('Invalid credentials')
-  if (!user.isVerified) throw new Error('Email not verified')
+
 
   const valid = await comparePassword(password, user.passwordHash)
   if (!valid) throw new Error('Invalid credentials')
