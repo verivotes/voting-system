@@ -13,6 +13,7 @@ export default function BallotPage() {
   const [selections, setSelections] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [voteSubmitted, setVoteSubmitted] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
@@ -42,10 +43,9 @@ export default function BallotPage() {
       for (const [, candidateId] of Object.entries(selections)) {
         await castVote({ electionId: id, candidateId })
       }
-      navigate(`/elections/${id}`)
+      setVoteSubmitted(true)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to cast vote')
-    } finally {
       setSubmitting(false)
     }
   }
@@ -60,17 +60,31 @@ export default function BallotPage() {
     </div>
   )
 
+  if (voteSubmitted) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="text-center max-w-sm">
+        <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 size={32} className="text-white" />
+        </div>
+        <h1 className="text-2xl font-semibold text-black mb-2">Vote Cast</h1>
+        <p className="text-sm text-gray-500 mb-8">Your ballot has been anonymously recorded and secured with SHA-256 encryption.</p>
+        <button onClick={() => navigate(`/elections/${id}`)}
+          className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5">
+          <ArrowLeft size={14} /> Back to election
+        </button>
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
-        {/* Back */}
         <button onClick={() => navigate(`/elections/${id}`)}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-black transition-colors mb-6">
           <ArrowLeft size={14} /> Back to election
         </button>
 
-        {/* Header */}
         <div className="mb-6">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
             <Vote size={11} /> Official Ballot
@@ -79,7 +93,6 @@ export default function BallotPage() {
           <p className="text-sm text-gray-500 mt-1">Select one candidate for each position</p>
         </div>
 
-        {/* Warning */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6 flex items-start gap-3">
           <AlertTriangle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
@@ -88,14 +101,12 @@ export default function BallotPage() {
           </div>
         </div>
 
-        {/* Error */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
             <AlertTriangle size={13} /> {error}
           </div>
         )}
 
-        {/* Ballot positions */}
         <div className="space-y-4 mb-6">
           {election?.positions?.map((pos: any, index: number) => (
             <div key={pos.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -117,18 +128,14 @@ export default function BallotPage() {
                   const isSelected = selections[pos.id] === c.id
                   return (
                     <button key={c.id} onClick={() => handleSelect(pos.id, c.id)}
-                      className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-all duration-150 ${
-                        isSelected ? 'bg-black' : 'hover:bg-gray-50'
-                      }`}>
+                      className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-all duration-150 ${isSelected ? 'bg-black' : 'hover:bg-gray-50'}`}>
                       <div className="flex-shrink-0">
                         {isSelected
                           ? <CheckCircle size={18} className="text-white" />
                           : <Circle size={18} className="text-gray-300" />
                         }
                       </div>
-                      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
-                        isSelected ? 'bg-white text-black' : 'bg-gray-100 text-gray-600'
-                      }`}>
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${isSelected ? 'bg-white text-black' : 'bg-gray-100 text-gray-600'}`}>
                         {c.user.fullName[0].toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -152,7 +159,6 @@ export default function BallotPage() {
           ))}
         </div>
 
-        {/* Submit bar */}
         <div className={`rounded-xl p-5 flex items-center justify-between gap-4 transition-colors ${allSelected ? 'bg-black' : 'bg-white border border-gray-200'}`}>
           <div>
             <p className={`text-sm font-medium ${allSelected ? 'text-white' : 'text-black'}`}>
@@ -178,7 +184,6 @@ export default function BallotPage() {
           </button>
         </div>
 
-        {/* Security note */}
         <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1.5">
           <ShieldCheck size={11} /> Votes are encrypted and anonymised via SHA-256 audit chain
         </p>

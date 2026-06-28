@@ -4,8 +4,8 @@ import { getElections, createElection, updateElectionStatus, deleteElection } fr
 import { verifyAuditChain } from '../api/votes'
 import {
   ShieldCheck, Plus, Settings, ClipboardList, Trash2,
-  ChevronRight, CheckCircle2, XCircle, BarChart3,
-  FileText, Play, Square, Eye, Lock, Calendar
+  CheckCircle2, XCircle, BarChart3,
+  FileText, Play, Square, Eye, Lock, Calendar, Clock
 } from 'lucide-react'
 
 export default function AdminPanel() {
@@ -79,6 +79,8 @@ export default function AdminPanel() {
     { id: 'audit', label: 'Audit Log', icon: <ClipboardList size={13} /> },
   ] as const
 
+  const inputClass = "w-full bg-white border-2 border-gray-200 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:border-black transition-colors cursor-pointer"
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -127,23 +129,20 @@ export default function AdminPanel() {
               const next = nextLabel[el.status]
               return (
                 <div key={el.id} className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="font-medium text-black text-sm">{el.title}</h3>
-                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${s.color}`}>
-                          {s.icon} {s.label}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-400 flex items-center gap-3">
-                        <span className="flex items-center gap-1"><Calendar size={10} /> {new Date(el.createdAt).toLocaleDateString()}</span>
-                        <span className="flex items-center gap-1"><Settings size={10} /> {el.positions?.length || 0} positions</span>
-                      </p>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 className="font-medium text-black text-sm">{el.title}</h3>
+                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${s.color}`}>
+                        {s.icon} {s.label}
+                      </span>
                     </div>
+                    <p className="text-xs text-gray-400 flex items-center gap-3">
+                      <span className="flex items-center gap-1"><Calendar size={10} /> {new Date(el.createdAt).toLocaleDateString()}</span>
+                      <span className="flex items-center gap-1"><Settings size={10} /> {el.positions?.length || 0} positions</span>
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link to={`/admin/elections/${el.id}`}
-                      title="Manage"
                       className="inline-flex items-center gap-1.5 text-sm border border-gray-200 hover:border-black text-gray-600 hover:text-black px-3 py-1.5 rounded-lg transition-all duration-200 hover:shadow-sm">
                       <Settings size={12} /> Manage
                     </Link>
@@ -155,7 +154,6 @@ export default function AdminPanel() {
                     )}
                     {el.status !== 'OPEN' && (
                       <button onClick={() => handleDelete(el.id)}
-                        title="Delete election"
                         className="inline-flex items-center gap-1.5 text-sm border border-red-200 hover:border-red-500 text-red-500 hover:text-red-700 px-3 py-1.5 rounded-lg transition-all duration-200 hover:shadow-sm">
                         <Trash2 size={12} /> Delete
                       </button>
@@ -170,30 +168,36 @@ export default function AdminPanel() {
         {/* Create tab */}
         {activeTab === 'create' && (
           <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8">
-            <h2 className="font-semibold text-black mb-6 flex items-center gap-2"><Plus size={16} /> Create New Election</h2>
+            <h2 className="font-semibold text-black mb-6 flex items-center gap-2">
+              <Plus size={16} /> Create New Election
+            </h2>
             <form onSubmit={handleCreate} className="space-y-5">
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1.5 block">Election title</label>
                 <input value={title} onChange={e => setTitle(e.target.value)}
-                  className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className={inputClass}
                   placeholder="e.g. Student Union Election 2026" required />
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1.5 block">Description</label>
                 <input value={description} onChange={e => setDescription(e.target.value)}
-                  className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className={inputClass}
                   placeholder="Brief description of the election" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1.5 block flex items-center gap-1.5"><Calendar size={12} /> Start date & time</label>
+                  <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5 block">
+                    <Calendar size={12} className="text-gray-400" /> Start date & time
+                  </label>
                   <input type="datetime-local" value={startTime} onChange={e => setStartTime(e.target.value)}
-                    className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black" required />
+                    className={inputClass} required />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1.5 block flex items-center gap-1.5"><Clock size={12} /> End date & time</label>
+                  <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5 block">
+                    <Clock size={12} className="text-gray-400" /> End date & time
+                  </label>
                   <input type="datetime-local" value={endTime} onChange={e => setEndTime(e.target.value)}
-                    className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black" required />
+                    className={inputClass} required />
                 </div>
               </div>
               <div className="pt-2">
@@ -218,7 +222,7 @@ export default function AdminPanel() {
             </div>
             <div className="p-6">
               {auditStatus ? (
-                <div className="space-y-0 divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100">
                   {[
                     { label: 'Chain integrity', value: auditStatus.intact ? '✓ Intact' : '✗ Compromised', color: auditStatus.intact ? 'text-emerald-600' : 'text-red-600' },
                     { label: 'Total log entries', value: auditStatus.totalEntries, color: 'text-black' },
