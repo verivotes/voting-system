@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const API = axios.create({ 
-  baseURL: 'https://efficient-mindfulness-production-5fd7.up.railway.app/api',
+  baseURL: 'https://voting-system-z1ig.onrender.com/api',
   timeout: 60000
 })
 
