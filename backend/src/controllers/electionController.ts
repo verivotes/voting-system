@@ -7,7 +7,8 @@ const {
   addPosition,
   registerCandidate,
   updateElectionStatus,
-  approveCandidate
+  approveCandidate,
+  removeElection
 } = require('../services/electionService')
 
 export async function httpCreateElection(req: Request, res: Response): Promise<void> {
