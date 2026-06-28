@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth'
-import prisma from './utils/prisma'
 
 dotenv.config()
 
@@ -23,15 +22,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/elections', electionRoutes)
 app.use('/api/votes', voteRoutes)
 
-setInterval(async () => {
-  try {
-    await prisma.$queryRaw`SELECT 1`
-    console.log('Keep-alive ping sent')
-  } catch (e) {}
-}, 4 * 60 * 1000)
-
 app.listen(PORT, () => {
-  console.log(`VeriVotes API running on port ${PORT}`)
+  console.log('VeriVotes API running on port ' + PORT)
 })
 
 export default app
