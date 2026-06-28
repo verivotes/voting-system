@@ -29,9 +29,9 @@ export async function getElectionById(id: string) {
       createdBy: { select: { fullName: true, email: true } },
       positions: {
         include: {
-candidates: {
-  include: { user: { select: { fullName: true, email: true } } }
-}
+          candidates: {
+            include: { user: { select: { fullName: true, email: true } } }
+          }
         }
       }
     }
@@ -44,10 +44,7 @@ export async function addPosition(electionId: string, title: string, maxVotes: n
   const election = await prisma.election.findUnique({ where: { id: electionId } })
   if (!election) throw new Error('Election not found')
   if (election.status !== 'DRAFT') throw new Error('Can only add positions to draft elections')
-
-  return prisma.position.create({
-    data: { electionId, title, maxVotes }
-  })
+  return prisma.position.create({ data: { electionId, title, maxVotes } })
 }
 
 export async function registerCandidate(positionId: string, userId: string, manifesto?: string) {
@@ -58,41 +55,22 @@ export async function registerCandidate(positionId: string, userId: string, mani
   if (!position) throw new Error('Position not found')
   if (position.election.status !== 'DRAFT') throw new Error('Candidate registration is closed')
 
-  const existing = await prisma.candidate.findFirst({
-    where: { positionId, userId }
-  })
+  const existing = await prisma.candidate.findFirst({ where: { positionId, userId } })
   if (existing) throw new Error('Already registered for this position')
 
-  return prisma.candidate.create({
-    data: { positionId, userId, manifesto }
-  })
+  return prisma.candidate.create({ data: { positionId, userId, manifesto } })
 }
 
 export async function updateElectionStatus(id: string, status: ElectionStatus) {
   const election = await prisma.election.findUnique({ where: { id } })
   if (!election) throw new Error('Election not found')
-
-  return prisma.election.update({
-    where: { id },
-    data: { status, updatedAt: new Date() }
-  })
+  return prisma.election.update({ where: { id }, data: { status, updatedAt: new Date() } })
 }
 
 export async function approveCandidate(candidateId: string) {
-  return prisma.candidate.update({
-    where: { id: candidateId },
-    data: { status: 'APPROVED' }
-  })
+  return prisma.candidate.update({ where: { id: candidateId }, data: { status: 'APPROVED' } })
 }
-module.exports = {
-  createElection,
-  getAllElections,
-  getElectionById,
-  addPosition,
-  registerCandidate,
-  updateElectionStatus,
-  approveCandidate
-}
+
 export async function removeElection(id: string) {
   const election = await prisma.election.findUnique({
     where: { id },
@@ -101,7 +79,6 @@ export async function removeElection(id: string) {
   if (!election) throw new Error('Election not found')
   if (election.status === 'OPEN') throw new Error('Cannot delete an open election')
 
-  // Delete in order: votes → candidates → positions → voter receipts → election
   for (const position of election.positions) {
     for (const candidate of position.candidates) {
       await prisma.vote.deleteMany({ where: { candidateId: candidate.id } })
@@ -111,4 +88,15 @@ export async function removeElection(id: string) {
   await prisma.position.deleteMany({ where: { electionId: id } })
   await prisma.voterReceipt.deleteMany({ where: { electionId: id } })
   return prisma.election.delete({ where: { id } })
+}
+
+module.exports = {
+  createElection,
+  getAllElections,
+  getElectionById,
+  addPosition,
+  registerCandidate,
+  updateElectionStatus,
+  approveCandidate,
+  removeElection
 }
