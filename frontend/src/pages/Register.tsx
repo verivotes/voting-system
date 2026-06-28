@@ -68,10 +68,21 @@ export default function Register() {
                 className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 placeholder="••••••••" required />
             </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 mt-2">
-              {loading ? 'Creating account...' : 'Create account'}
-            </button>
+<button type="submit" disabled={loading}
+  className="w-full bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 mt-2 flex items-center justify-center gap-2">
+  {loading ? (
+    <>
+      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+      Creating account...
+    </>
+  ) : 'Create account'}
+</button>
+
+{loading && (
+  <p className="text-center text-xs text-gray-400 mt-2">
+    Server is waking up, this may take 20-30 seconds...
+  </p>
+)}
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
