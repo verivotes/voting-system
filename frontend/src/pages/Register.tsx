@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { registerUser, verifyOtp } from '../api/auth'
+import { registerUser } from '../api/auth'
 
 export default function Register() {
   const [fullName, setFullName] = useState('')
@@ -10,44 +10,31 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  setError('')
-  try {
-    const res = await registerUser({ email, password, fullName })
-    const otp = res.data.otp
-    if (otp) {
-      try {
-        await verifyOtp({ email, token: otp })
-      } catch {
-        // OTP verify failed — manually verify via fallback
-      }
-    }
-    navigate('/login')
-  } catch (err: any) {
-    if (err.response?.data?.message === 'Email already registered') {
-      // Account was created but verify failed — just go to login
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await registerUser({ email, password, fullName })
       navigate('/login')
-    } else {
-      setError(err.response?.data?.message || 'Registration failed')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Registration failed. Server may be starting up — please try again.')
+    } finally {
+      setLoading(false)
     }
-  } finally {
-    setLoading(false)
   }
-}
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-<svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-6">
-  <rect width="28" height="28" rx="6" fill="black"/>
-  <rect x="7" y="8" width="14" height="13" rx="1.5" stroke="white" strokeWidth="1.5"/>
-  <path d="M7 11h14" stroke="white" strokeWidth="1.5"/>
-  <path d="M11 15.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</svg>
+            <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-6">
+              <rect width="28" height="28" rx="6" fill="black"/>
+              <rect x="7" y="8" width="14" height="13" rx="1.5" stroke="white" strokeWidth="1.5"/>
+              <path d="M7 11h14" stroke="white" strokeWidth="1.5"/>
+              <path d="M11 15.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <h1 className="text-2xl font-semibold text-black tracking-tight">Create account</h1>
             <p className="text-sm text-gray-500 mt-1">Join VeriVotes to participate in elections</p>
           </div>
@@ -77,21 +64,20 @@ const handleRegister = async (e: React.FormEvent) => {
                 className="w-full bg-white border border-gray-300 text-black px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 placeholder="••••••••" required />
             </div>
-<button type="submit" disabled={loading}
-  className="w-full bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 mt-2 flex items-center justify-center gap-2">
-  {loading ? (
-    <>
-      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-      Creating account...
-    </>
-  ) : 'Create account'}
-</button>
-
-{loading && (
-  <p className="text-center text-xs text-gray-400 mt-2">
-    Server is waking up, this may take 20-30 seconds...
-  </p>
-)}
+            <button type="submit" disabled={loading}
+              className="w-full bg-black hover:bg-gray-800 text-white py-2.5 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 mt-2 flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating account...
+                </>
+              ) : 'Create account'}
+            </button>
+            {loading && (
+              <p className="text-center text-xs text-gray-400">
+                Please wait — server may take up to 30 seconds to respond
+              </p>
+            )}
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
