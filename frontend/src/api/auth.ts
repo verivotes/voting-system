@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const API = axios.create({ baseURL: 'https://voting-system-production-4cc6.up.railway.app/api' })
+const API = axios.create({ 
+  baseURL: 'https://voting-system-production-4cc6.up.railway.app/api',
+  timeout: 60000 // 60 seconds — gives Railway time to wake up
+})
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
